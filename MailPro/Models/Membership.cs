@@ -8,6 +8,7 @@ namespace MailPro.Models
     public class Membership
     {
         public int FacultyID { get; set; }
+
         public string FacultyName { get; set; }
         public string FacultyEmail { get; set; }
         public int FacultyPhoneNo { get; set; }

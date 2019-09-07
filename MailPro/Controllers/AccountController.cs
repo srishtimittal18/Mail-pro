@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using MailPro.Models;
+using System.Web.Security;
 
 namespace MailPro.Controllers
 {
@@ -16,9 +17,20 @@ namespace MailPro.Controllers
         }
 
         [HttpPost]
-        public ActionResult Login(Membership model)
+        public ActionResult Login(Models.Membership model)
         {
-            return View();
+            using(var context = new MailProEntities())
+            {
+                bool IsValid = context.FacultyTable.Any(x => x.FacultyEmail == model.FacultyEmail && x.Password == model.Password);
+                if(IsValid)
+                {
+                    FormsAuthentication.SetAuthCookie(model.FacultyEmail, false);
+                    return RedirectToAction("Index", "GetAllSudents");
+                }
+                ModelState.AddModelError("", "Invalid Email or Password");
+                return View();
+            }
+            
         }
 
         public ActionResult Signup()
@@ -27,9 +39,14 @@ namespace MailPro.Controllers
         }
 
         [HttpPost]
-        public ActionResult Signup(Membership model)
+        public ActionResult Signup(FacultyTable model)
         {
-            return View();
+            using( var context = new MailProEntities())
+            {
+                context.FacultyTable.Add(model);
+                context.SaveChanges();
+            }
+            return RedirectToAction("Login");
         }
     }
 }
